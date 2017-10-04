@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Provisions OpsGenie Heartbeats using CloudFormation
+
+Parameters:
+  OpsGenieHeartbeatApiKey:
+    Type: String
+    NoEcho: true
+
+Resources:
+  HeartbeatLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+              - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  HeartbeatFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !GetAtt HeartbeatLambdaExecutionRole.Arn
+      Description: Lambda function that manages OpsGenie heartbeats
+      Code: code
+      Handler: opsgenie_heartbeat.lambda_handler
+      Runtime: python3.6
+      Timeout: 15
+      Environment:
+        Variables:
+          OPSGENIE_HEARTBEAT_API_KEY: !Ref OpsGenieHeartbeatApiKey
+
+  Heartbeat1:
+    Type: Custom::OpsGenieHeartbeat
+    Properties:
+      ServiceToken: !GetAtt HeartbeatFunction.Arn
+      Name: Heartbeat1
+      Interval: 30
+      IntervalUnit: 'minutes'
+      Description: 'Our first heartbeat'
+      Enabled: 'true'
+
+  Heartbeat2:
+    Type: Custom::OpsGenieHeartbeat
+    Properties:
+      ServiceToken: !GetAtt HeartbeatFunction.Arn
+      Name: Heartbeat2
+      Interval: 4
+      IntervalUnit: 'hours'
+      Description: 'Our second heartbeat'
+      Enabled: 'false'
