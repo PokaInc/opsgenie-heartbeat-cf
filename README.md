@@ -1,3 +1,10 @@
+# opsgenie-heartbeat-cf
+
+Example of CloudFormation Custom Resource for managing OpsGenie Heartbeats
+
+As seen on [Managing OpsGenie Heartbeats using CloudFormation](https://medium.com/poka-techblog/managing-opsgenie-heartbeats-using-cloudformation-f7a328a75eea)
+
+
 ## Deployment
 
 First, package your Cloudformation template:
